@@ -49,12 +49,12 @@ type SendToInput struct {
 
 func (to *SendToInput) Data() []byte {
     msg := []byte("To: " + *to.To +
-        "\r\nFrom: " +
+        "\r\nFrom: <" +
         to.From +
         ">\r\nSubject: " +
         *to.Subject +
         "\r\n" +
-        *to.Type + "\r\n\r\n" +
+        TYPE[*to.Type] + "\r\n\r\n" +
         *to.Body)
     return msg
 
