@@ -185,7 +185,7 @@ func main() {
         ToInput.From = *u.Email
 
         SendEmail(&u, &ToInput)
-        fmt.Println("Send email success").
+        fmt.Println("Send email success")
 
     }
 
