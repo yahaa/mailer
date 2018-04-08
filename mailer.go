@@ -75,9 +75,10 @@ func (l *LoginInput) Invalid() bool {
 }
 
 func SendEmail(lg *LoginInput, to *SendToInput) error {
+    host := fmt.Sprintf("%s:%d", *lg.Host, *lg.Port)
     auth := smtp.PlainAuth("", *lg.Email, *lg.Pass, *lg.Host)
     sendTo := strings.Split(*to.To, ";")
-    err := smtp.SendMail(*lg.Host+":"+string(*lg.Port), auth, to.From, sendTo, to.Data())
+    err := smtp.SendMail(host, auth, to.From, sendTo, to.Data())
     return err
 
 }
@@ -166,7 +167,7 @@ func main() {
 
     if send.Parsed() {
         if ToInput.Invalid() {
-            login.PrintDefaults()
+            send.PrintDefaults()
             os.Exit(1)
         }
 
@@ -184,7 +185,11 @@ func main() {
 
         ToInput.From = *u.Email
 
-        SendEmail(&u, &ToInput)
+        err = SendEmail(&u, &ToInput)
+        if err != nil {
+            fmt.Printf("Error %v", err)
+            os.Exit(1)
+        }
         fmt.Println("Send email success")
 
     }
