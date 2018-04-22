@@ -1,18 +1,18 @@
 package main
 
 import (
-    "flag"
-    "os"
-    "fmt"
-    "os/user"
-    "io/ioutil"
     "encoding/json"
-    "strings"
+    "flag"
+    "fmt"
+    "io/ioutil"
     "net/smtp"
+    "os"
+    "os/user"
+    "strings"
 )
 
 var (
-    MSG = `Usage:	mailer COMMAND
+    USAGE = `Usage:	mailer COMMAND
 
 Commands:
 login               Login to mailer
@@ -24,7 +24,7 @@ Run 'mailer COMMAND --help' for more information on a command.
     PATH     = "/.mailer/"
     FILENAME = "mailer.json"
     LogInput LoginInput
-    ToInput  SendToInput
+    Msg      Message
     TYPE     = map[string]string{
         "html":  "Content-Type: text/html; charset=UTF-8",
         "plain": "Content-Type: text/plain; charset=UTF-8",
@@ -39,7 +39,7 @@ type LoginInput struct {
     Pass     *string
 }
 
-type SendToInput struct {
+type Message struct {
     To      *string
     From    string
     Subject *string
@@ -47,7 +47,7 @@ type SendToInput struct {
     Body    *string
 }
 
-func (to *SendToInput) Data() []byte {
+func (to *Message) Data() []byte {
     msg := []byte("To: " + *to.To +
         "\r\nFrom: <" +
         to.From +
@@ -60,7 +60,7 @@ func (to *SendToInput) Data() []byte {
 
 }
 
-func (to *SendToInput) Invalid() bool {
+func (to *Message) Invalid() bool {
     if *to.To == "" || *to.Subject == "" || *to.Type == "" || *to.Body == "" {
         return true
     }
@@ -74,7 +74,7 @@ func (l *LoginInput) Invalid() bool {
     return false
 }
 
-func SendEmail(lg *LoginInput, to *SendToInput) error {
+func SendEmail(lg *LoginInput, to *Message) error {
     host := fmt.Sprintf("%s:%d", *lg.Host, *lg.Port)
     auth := smtp.PlainAuth("", *lg.Email, *lg.Pass, *lg.Host)
     sendTo := strings.Split(*to.To, ";")
@@ -101,14 +101,14 @@ func main() {
     LogInput.Email = login.String("email", "", "Email such as example@gmail.com ")
     LogInput.Pass = login.String("pass", "", "The password of your email")
 
-    // SendToInput
-    ToInput.To = send.String("to", "", "Which emails want to send more email split by ';' such as a@qq.com;b@qq.com")
-    ToInput.Type = send.String("type", "plain", "Which email context type want to send")
-    ToInput.Subject = send.String("subject", "", "Email Subject")
-    ToInput.Body = send.String("body", "", "Email body")
+    // Message
+    Msg.To = send.String("to", "", "Which emails want to send more email split by ';' such as a@qq.com;b@qq.com")
+    Msg.Type = send.String("type", "plain", "Which email context type want to send")
+    Msg.Subject = send.String("subject", "", "Email Subject")
+    Msg.Body = send.String("body", "", "Email body")
 
     if len(os.Args) < 2 {
-        fmt.Println(MSG)
+        fmt.Println(USAGE)
         os.Exit(1)
     }
 
@@ -166,7 +166,7 @@ func main() {
     }
 
     if send.Parsed() {
-        if ToInput.Invalid() {
+        if Msg.Invalid() {
             send.PrintDefaults()
             os.Exit(1)
         }
@@ -183,9 +183,9 @@ func main() {
             os.Exit(1)
         }
 
-        ToInput.From = *u.Email
+        Msg.From = *u.Email
 
-        err = SendEmail(&u, &ToInput)
+        err = SendEmail(&u, &Msg)
         if err != nil {
             fmt.Printf("Error %v", err)
             os.Exit(1)
