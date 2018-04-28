@@ -6,7 +6,7 @@
 
 ### 特性
 
-* 便于 linux 系统下面发送邮件。
+* 目的是为了能够在 linux 服务器下用定时脚本发送邮件
 * 支持 gmail,163,qq等各大邮件提供发。
 * 支持 md 文件解析
 
@@ -16,16 +16,24 @@
 
 #### 使用
 
-> login
+* login
 
 ```bash
 mailer login -e your@163.com -p 123456
 ```
 
-> send email
+* send email
 
+> send markdown email
 ```bash
 mailer send -s="这是邮件的主题" -to="to@example.com" -f=ttt.md
+```
+
+> send plain email
+
+```bash
+mailer send -s="这是普通邮件的主题" -to="to@example.com" -b="这是邮件的 body"
+
 ```
 
 
