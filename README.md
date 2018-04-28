@@ -1,5 +1,32 @@
 ### mailer
 
-> go 实现的类似 linux/unix 系统下面的 mail 工具，
+> 本来想在自己的服务器上搭一套邮件服务系统，奈何云服务器厂商已经把25端口上行带宽给封杀了，我能怎么办，mail 命令又是非常难用(不会用)
+> 于是我脑子发热 用 go 实现的类似 linux/unix 系统下面的 mail 工具，我给它取名为 mailer
 
-#### 待续
+
+### 特性
+
+* 便于 linux 系统下面发送邮件。
+* 支持 gmail,163,qq等各大邮件提供发。
+* 支持 md 文件解析
+
+#### 安装
+
+> go get github.com/yahaa/mailer
+
+#### 使用
+
+> login
+
+```bash
+mailer login -e your@163.com -p 123456
+```
+
+> send email
+
+```bash
+mailer send -s="这是邮件的主题" -to="to@example.com" -f=ttt.md
+```
+
+
+
