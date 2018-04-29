@@ -32,9 +32,9 @@ Run 'mailer COMMAND --help' for more information on a command.
     PLAIN      = "Content-Type: text/plain; charset=UTF-8"
 
     SupportHost = map[string]Config{
-        "@163.com": {Protocol: "smtp", Port: 25, Host: "smtp.163.com"},
-        //"@qq.com":   {Protocol: "smtp", Port: 25, Host: "smtp.qq.com"},
-        //"@gmai.com": {Protocol: "smtp", Port: 25, Host: "smtp.gmail.com"},
+        "@163.com":   {Protocol: "smtp", Port: 25, Host: "smtp.163.com"},
+        //"@qq.com":    {Protocol: "smtp", Port: 25, Host: "smtp.qq.com"},
+        //"@gmail.com": {Protocol: "smtp", Port: 587, Host: "smtp.gmail.com"},
     }
 
     NotSupportError = errors.New("this type email we not support now")
@@ -47,7 +47,6 @@ type Login struct {
 
 type Send struct {
     To      *string
-    From    string
     Subject *string
     Type    *string
     Body    *string
@@ -287,7 +286,7 @@ func main() {
 
     curUser, err := user.Current()
     if err != nil {
-        fmt.Println("Not such permition")
+        fmt.Println(string(color.Red([]byte("Not such permition"))))
         os.Exit(1)
     }
     configDir := curUser.HomeDir + PATH
@@ -302,26 +301,26 @@ func main() {
 
         curUser, err := user.Current()
         if err != nil {
-            fmt.Println("Not such permition")
+            fmt.Println(string(color.Red([]byte("Not such permition"))))
             os.Exit(1)
         }
         configDir := curUser.HomeDir + PATH
 
         err = os.MkdirAll(configDir, os.ModePerm)
         if err != nil {
-            fmt.Printf("Error %v", err)
+            fmt.Println(string(color.Red([]byte(err.Error()))))
             os.Exit(1)
         }
 
         data, err := json.Marshal(LoginInput)
         if err != nil {
-            fmt.Println("Process error")
+            fmt.Println(string(color.Red([]byte(err.Error()))))
             os.Exit(1)
         }
 
         err = ioutil.WriteFile(configName, data, os.ModePerm)
         if err != nil {
-            fmt.Printf("Error %v", err)
+            fmt.Println(string(color.Red([]byte(err.Error()))))
             os.Exit(1)
         }
 
@@ -337,12 +336,12 @@ func main() {
         var u Login
         data, err := ReadFile(configName)
         if err != nil {
-            fmt.Printf("Error %v", err)
+            fmt.Println(string(color.Red([]byte("please login"))))
             os.Exit(1)
         }
         err = json.Unmarshal(data, &u)
         if err != nil {
-            fmt.Printf("Error %v", err)
+            fmt.Println(string(color.Red([]byte("please login"))))
             os.Exit(1)
         }
 
@@ -364,7 +363,7 @@ func main() {
 
         err = SendEmail(&email)
         if err != nil {
-            fmt.Printf("Error %v", err)
+            fmt.Println(string(color.Red([]byte(err.Error()))))
             os.Exit(1)
         }
         fmt.Println(string(color.Green([]byte("Send email success"))))
